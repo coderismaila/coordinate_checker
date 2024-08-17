@@ -3,8 +3,7 @@ import pandas as pd
 import folium
 from streamlit_folium import st_folium
 
-
-st.title("Coordinate Checker")
+st.title("Coordinate Distribution Checker")
 
 uploaded_file = st.file_uploader("Upload your Excel file", type="xlsx")
 
