@@ -72,7 +72,6 @@ if uploaded_file is not None:
                 location_lon = row.get(lon_col, None)
                 dss_name = row.get(dss_name_col, None)
                 dss_code = row.get(dss_code_col, None)
-                print(dss_code)
 
                 folium.Marker(
                     location=[location_lat, location_lon],
