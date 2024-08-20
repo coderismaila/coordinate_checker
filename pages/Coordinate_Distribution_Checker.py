@@ -11,7 +11,7 @@ if uploaded_file is not None:
     df = pd.read_excel(uploaded_file)
 
     st.write("Uploaded Data:")
-    st.dataframe(df.head())
+    st.dataframe(df)
 
     # Search for possible latitude and longitude columns
     lat_col = None
@@ -24,12 +24,20 @@ if uploaded_file is not None:
             lat_col = col
         if "lon" in col.lower() or "lng" in col.lower() or "long" in col.lower():
             lon_col = col
-        if "dss code" in col.lower():
+        if "dss code" in col.lower().replace("\n", " "):
             dss_code_col = col
-        if "substation name" in col.lower():
+        if "substation name" in col.lower().replace(
+            "\n", " "
+        ) or "distribution substation" in col.lower().replace("\n", " "):
             dss_name_col = col
 
     if lat_col and lon_col:
+        if not dss_name_col:
+            st.error("Could not find DSS Name column auntomatically.")
+
+        if not dss_code_col:
+            st.error("Could not find DSS Code column auntomatically.")
+
         # Remove rows with invalid or missing latitude/longitude values
         df = df.dropna(subset=[lat_col, lon_col])
 
@@ -60,9 +68,15 @@ if uploaded_file is not None:
 
             # Add markers to the map
             for index, row in df.iterrows():
+                location_lat = row.get(lat_col, None)
+                location_lon = row.get(lon_col, None)
+                dss_name = row.get(dss_name_col, None)
+                dss_code = row.get(dss_code_col, None)
+                print(dss_code)
+
                 folium.Marker(
-                    location=[row[lat_col], row[lon_col]],
-                    popup=f"{row[dss_name_col]}(<span style='font-weight: 700;'>{row[dss_code_col]}</span>)<br>{row[lat_col]}, {row[lon_col]}",
+                    location=[location_lat, location_lon],
+                    popup=f"{dss_name}(<span style='font-weight: 700;'>{dss_code}</span>)<br>{location_lat}, {location_lon}",
                     icon=folium.Icon(icon="arrow-down", color="green"),
                 ).add_to(m)
 
